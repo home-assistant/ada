@@ -3,10 +3,6 @@ import logging
 import struct
 from typing import Optional
 
-import pyaudio
-import samplerate
-import numpy as np
-
 from .hotword import Hotword
 from .speech import Speech
 from .microphone import Microphone
@@ -22,12 +18,9 @@ class Dude:
         """Initialize dude."""
         self.hotword: Hotword = Hotword()
         self.speech: Speech = Speech()
-        self.microphone: Microphone = Microphone()
-        self.resampler: samplerate.Resampler = samplerate.Resampler(
-            "sinc_best", channels=1
+        self.microphone: Microphone = Microphone(
+            self.hotword.frame_length, self.hotword.sample_rate
         )
-
-        self.resampler_ratio: float = self.hotword.sample_rate / self.microphone.sample_rate
 
     def run(self) -> None:
         """Run Dude in a loop."""
@@ -42,18 +35,7 @@ class Dude:
         while True:
             pcm = self.microphone.get_frame()
 
-            # Need resampling
-            if self.resampler_ratio != 1:
-                pcm = self.resampler.process(pcm, self.resampler_ratio)
-
-            found: bool = False
-            for frame in divide_chunks(pcm, self.hotword.frame_length):
-                if not self.hotword.process(frame):
-                    continue
-                found = True
-                break
-
-            # Found hotword?
-            if not found:
+            if not self.hotword.process(pcm):
                 continue
+
             _LOGGER.info("Detect hotword")

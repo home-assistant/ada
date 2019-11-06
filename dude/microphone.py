@@ -7,20 +7,23 @@ import numpy as np
 class Microphone:
     """Hotword processing."""
 
-    def __init__(self) -> None:
+    def __init__(self, frame_length: int, sample_rate: int) -> None:
         """Initialize Hotword processing."""
         self.audio = pyaudio.PyAudio()
         self.stream: Optional[pyaudio.Stream] = None
 
+        self._frame_length = frame_length
+        self._sample_rate = sample_rate
+
     @property
     def frame_length(self) -> int:
         """Return frame length for processing hotword."""
-        return 4096
+        return self._frame_length
 
     @property
     def sample_rate(self) -> int:
         """Return sample rate for recording."""
-        return 44100
+        return self._sample_rate
 
     @property
     def bit_rate(self) -> int:
