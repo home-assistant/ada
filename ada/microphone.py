@@ -8,7 +8,7 @@ class Microphone:
     """Hotword processing."""
 
     def __init__(self, frame_length: int, sample_rate: int) -> None:
-        """Initialize Hotword processing."""
+        """Initialize Microphone processing."""
         self.audio = pyaudio.PyAudio()
         self.stream: Optional[pyaudio.Stream] = None
 

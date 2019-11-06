@@ -8,6 +8,7 @@ from .homeassistant import HomeAssistant
 from .hotword import Hotword
 from .microphone import Microphone
 from .speech import Speech
+from .voice import Voice
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -21,6 +22,7 @@ class Ada:
         self.hotword: Hotword = Hotword()
         self.speech: Speech = Speech(self.homeassistant)
         self.conversation: Conversation = Conversation(self.homeassistant)
+        self.voice: Voice = Voice(self.homeassistant)
         self.microphone: Microphone = Microphone(
             self.hotword.frame_length, self.hotword.sample_rate
         )
@@ -42,10 +44,16 @@ class Ada:
                 continue
             _LOGGER.info("Detect hotword")
 
-            text = self.speech.process(self.microphone)
-            if not text:
-                continue
+            # Start conversation
+            while True:
+                text = self.speech.process(self.microphone)
+                if not text or text == "stop":
+                    break
 
-            answer = self.conversation.process(text)
-            if not answer:
-                continue
+                answer = self.conversation.process(text)
+                if not answer:
+                    break
+
+                if not self.voice.process(answer):
+                    break
+

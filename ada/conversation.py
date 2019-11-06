@@ -11,7 +11,7 @@ class Conversation:
     """Conversation handler."""
 
     def __init__(self, homeassistant: HomeAssistant) -> None:
-        """Initialize Hotword processing."""
+        """Initialize conversation processing."""
         self.homeassistant: HomeAssistant = homeassistant
 
     def process(self, text: str) -> Optional[str]:

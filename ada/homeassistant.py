@@ -34,7 +34,6 @@ class HomeAssistant:
 
     def send_conversation(self, text: str) -> Optional[str]:
         """Send Conversation text to API."""
-
         _LOGGER.info("Send text to Home Assistant conversation")
         req = requests.post(
             f"{self.url}/conversation/process",
@@ -46,3 +45,24 @@ class HomeAssistant:
             return None
         return req.json()
 
+    def send_tts(self, text: str) -> Optional[str]:
+        """Send a text for TTS."""
+        _LOGGER.info("Send text to Home Assistant TTS")
+        req = requests.post(
+            f"{self.url}/tts_get_url",
+            json={"platform": "cloud", "message": text},
+            headers=self.headers,
+        )
+
+        if req.status_code != 200:
+            return None
+        return req.json()
+
+    def get_tts_audio(self, filename: str) -> Optional[bytes]:
+        """Retrieve audio file."""
+        _LOGGER.info("Retrieve speech from Home Assistant TTS")
+        req = requests.post(f"{self.url}/tts_proxy/{filename}", headers=self.headers)
+
+        if req.status_code != 200:
+            return None
+        return req.content

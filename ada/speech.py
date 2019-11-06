@@ -20,7 +20,7 @@ class Speech:
     """Speech processing."""
 
     def __init__(self, homeassistant: HomeAssistant) -> None:
-        """Initialize Hotword processing."""
+        """Initialize Audio processing."""
         self.homeassistant: HomeAssistant = homeassistant
 
     @property
