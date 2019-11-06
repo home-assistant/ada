@@ -49,7 +49,7 @@ class Microphone:
 
     def get_frame(self) -> np.ndarray:
         """Read from audio stream."""
-        raw = self.stream(self.frame_length, exception_on_overflow=False)
+        raw = self.stream.read(self.frame_length, exception_on_overflow=False)
 
         pcm = np.fromstring(raw, dtype=np.int16)
         return pcm
