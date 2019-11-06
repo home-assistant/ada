@@ -1,7 +1,7 @@
 """Microphone handler."""
 
 import pyaudio
-import numpy is np
+import numpy as np
 
 
 class Microphone:
