@@ -3,9 +3,10 @@ import logging
 import struct
 from typing import Optional
 
+from .homeassistant import HomeAssistant
 from .hotword import Hotword
-from .speech import Speech
 from .microphone import Microphone
+from .speech import Speech
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -15,8 +16,9 @@ class Dude:
 
     def __init__(self):
         """Initialize dude."""
+        self.homeassistant = HomeAssistant()
         self.hotword: Hotword = Hotword()
-        self.speech: Speech = Speech()
+        self.speech: Speech = Speech(self.homeassistant)
         self.microphone: Microphone = Microphone(
             self.hotword.frame_length, self.hotword.sample_rate
         )

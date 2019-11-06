@@ -1,23 +1,25 @@
 """Dude speech enginge."""
 import audioop
 import logging
-from typing import Optional
+from typing import Optional, Generator
 from time import monotonic
 
 import pyaudio
 
 from .microphone import Microphone
+from .homeassistant import HomeAssistant
 
 _LOGGER = logging.getLogger(__name__)
 
-SILENT_WAIT_SECONDS = 3
+SILENT_WAIT_SECONDS = 2
 
 
 class Speech:
     """Speech processing."""
 
-    def __init__(self) -> None:
+    def __init__(self, homeassistant: HomeAssistant) -> None:
         """Initialize Hotword processing."""
+        self.homeassistant: HomeAssistant = homeassistant
 
     @property
     def sample_rate(self) -> int:
@@ -34,18 +36,36 @@ class Speech:
         """Return channel for recording."""
         return 1
 
-    def process(self, microphone: Microphone) -> Optional[str]:
-        """Process speech to text."""
+    def _get_voice_data(self, microphone: Microphone) -> Generator[bytes, None, None]:
+        """Process voice speech."""
         silent_time = None
         while True:
             pcm = microphone.get_frame()
+            pcm = pcm.tostring()
 
-            if self._detect_silent(pcm.tostring()):
+            # Handle silent
+            if self._detect_silent(pcm):
                 if silent_time is None:
                     silent_time = monotonic()
                 elif monotonic() - silent_time > SILENT_WAIT_SECONDS:
-                    _LOGGER.info("Command end")
+                    _LOGGER.info("Voice command ends")
                     return
+            else:
+                silent_time = None
+
+            yield pcm
+
+    def process(self, microphone: Microphone) -> Optional[str]:
+        """Process Speech to Text."""
+        _LOGGER.info("Send voice to Home Assistant STT")
+        speech = self.homeassistant.send_stt(self._get_voice_data(microphone))
+
+        if speech["result"] != "success":
+            _LOGGER.error("Can't detect speech on audio stream")
+            return None
+
+        _LOGGER.info("Retrieve follow Voice: %s", speech["text"])
+        return speech["text"]
 
     @staticmethod
     def _detect_silent(pcm) -> bool:
