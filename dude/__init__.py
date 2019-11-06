@@ -43,7 +43,7 @@ class Dude:
 
             # Need resampling
             if self.resampler_ratio != 1:
-                pcm = self.resampler(pcm, self.resampler_ratio)
+                pcm = self.resampler.process(pcm, self.resampler_ratio)
 
             found: bool = False
             for frame in np.array_split(pcm, self.hotword.frame_length):
