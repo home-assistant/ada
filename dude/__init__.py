@@ -34,7 +34,7 @@ class Dude:
         try:
             self._run()
         finally:
-            self.microphone.close()
+            self.microphone.stop()
 
     def _run(self) -> None:
         """Internal Runner."""
