@@ -89,7 +89,7 @@ class Speech:
             audioop.add(pcm, energy_bytes * (len(pcm) // 2), 2), 2
         )
 
-        if debiased_energy > 30:  # probably actually audio
+        if debiased_energy > 400:  # probably actually audio
             return False
         else:
             return True
