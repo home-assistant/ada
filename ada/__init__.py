@@ -3,6 +3,7 @@ import logging
 import struct
 from typing import Optional
 
+from .conversation import Conversation
 from .homeassistant import HomeAssistant
 from .hotword import Hotword
 from .microphone import Microphone
@@ -19,6 +20,7 @@ class Ada:
         self.homeassistant = HomeAssistant()
         self.hotword: Hotword = Hotword()
         self.speech: Speech = Speech(self.homeassistant)
+        self.conversation: Conversation = Conversation(self.homeassistant)
         self.microphone: Microphone = Microphone(
             self.hotword.frame_length, self.hotword.sample_rate
         )
@@ -44,5 +46,6 @@ class Ada:
             if not text:
                 continue
 
-            answer = self.homeassistant.send_conversation(text)
-            print(answer)
+            answer = self.conversation.process(text)
+            if not answer:
+                continue
