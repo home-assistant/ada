@@ -10,6 +10,7 @@ import numpy as np
 from .hotword import Hotword
 from .speech import Speech
 from .microphone import Microphone
+from .utils import divide_chunks
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -46,7 +47,7 @@ class Dude:
                 pcm = self.resampler.process(pcm, self.resampler_ratio)
 
             found: bool = False
-            for frame in np.array_split(pcm, self.hotword.frame_length):
+            for frame in divide_chunks(pcm, self.hotword.frame_length):
                 if not self.hotword.process(frame):
                     continue
                 found = True
