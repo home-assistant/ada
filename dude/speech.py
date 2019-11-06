@@ -2,12 +2,15 @@
 import audioop
 import logging
 from typing import Optional
+from time import monotonic
 
 import pyaudio
 
 from .microphone import Microphone
 
 _LOGGER = logging.getLogger(__name__)
+
+SILENT_WAIT_SECONDS = 3
 
 
 class Speech:
@@ -33,11 +36,16 @@ class Speech:
 
     def process(self, microphone: Microphone) -> Optional[str]:
         """Process speech to text."""
+        silent_time = None
         while True:
             pcm = microphone.get_frame()
 
-            if self._detect_silent(pcm):
-                _LOGGER.info("command end")
+            if self._detect_silent(pcm.tostring()):
+                if silent_time is None:
+                    silent_time = monotonic()
+                elif monotonic() - silent_time < SILENT_WAIT_SECONDS:
+                    _LOGGER.info("Command end")
+                    return
 
     @staticmethod
     def _detect_silent(pcm) -> bool:
