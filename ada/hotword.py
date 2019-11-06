@@ -1,4 +1,4 @@
-"""Dude hotword enginge."""
+"""Ada hotword enginge."""
 import sys
 from pathlib import Path
 import platform

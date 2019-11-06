@@ -1,4 +1,4 @@
-"""The Dude Module."""
+"""The Ada Module."""
 import logging
 import struct
 from typing import Optional
@@ -11,11 +11,11 @@ from .speech import Speech
 _LOGGER = logging.getLogger(__name__)
 
 
-class Dude:
-    """Hey Dude assistant."""
+class Ada:
+    """Hey Ada assistant."""
 
     def __init__(self):
-        """Initialize dude."""
+        """Initialize ada."""
         self.homeassistant = HomeAssistant()
         self.hotword: Hotword = Hotword()
         self.speech: Speech = Speech(self.homeassistant)
@@ -24,7 +24,7 @@ class Dude:
         )
 
     def run(self) -> None:
-        """Run Dude in a loop."""
+        """Run Ada in a loop."""
         self.microphone.start()
         try:
             self._run()
@@ -38,6 +38,11 @@ class Dude:
 
             if not self.hotword.process(pcm):
                 continue
-
             _LOGGER.info("Detect hotword")
-            self.speech.process(self.microphone)
+
+            text = self.speech.process(self.microphone)
+            if not text:
+                continue
+
+            answer = self.homeassistant.send_conversation(text)
+            print(answer)

@@ -1,7 +1,7 @@
-"""Dude assistant."""
+"""Ada assistant."""
 import logging
 
-from dude import Dude
+from ada import Ada
 
 
 def init_logger():
@@ -20,8 +20,8 @@ def main():
     """Run Application."""
     init_logger()
 
-    dude = Dude()
-    dude.run()
+    ada = Ada()
+    ada.run()
 
 
 if __name__ == "__main__":

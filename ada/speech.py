@@ -1,13 +1,15 @@
-"""Dude speech enginge."""
+"""Ada speech enginge."""
 import audioop
+import io
 import logging
-from typing import Optional, Generator
+import wave
 from time import monotonic
+from typing import Generator, Optional
 
 import pyaudio
 
-from .microphone import Microphone
 from .homeassistant import HomeAssistant
+from .microphone import Microphone
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,6 +41,17 @@ class Speech:
     def _get_voice_data(self, microphone: Microphone) -> Generator[bytes, None, None]:
         """Process voice speech."""
         silent_time = None
+
+        # Send Wave header
+        wave_buffer = io.BytesIO()
+        wav = wave.open(wave_buffer, "wb")
+        wav.setnchannels(self.channel)
+        wav.setsampwidth(2)
+        wav.setframerate(self.sample_rate)
+        wav.close()
+        yield wave_buffer.getvalue()
+
+        # Process audio stream
         while True:
             pcm = microphone.get_frame()
             pcm = pcm.tostring()
@@ -50,17 +63,16 @@ class Speech:
                 elif monotonic() - silent_time > SILENT_WAIT_SECONDS:
                     _LOGGER.info("Voice command ends")
                     return
-            else:
+            elif silent_time:
                 silent_time = None
 
             yield pcm
 
     def process(self, microphone: Microphone) -> Optional[str]:
         """Process Speech to Text."""
-        _LOGGER.info("Send voice to Home Assistant STT")
         speech = self.homeassistant.send_stt(self._get_voice_data(microphone))
 
-        if speech["result"] != "success":
+        if not speech or speech["result"] != "success":
             _LOGGER.error("Can't detect speech on audio stream")
             return None
 
