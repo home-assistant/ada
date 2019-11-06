@@ -6,7 +6,6 @@ from typing import Optional
 from .hotword import Hotword
 from .speech import Speech
 from .microphone import Microphone
-from .utils import divide_chunks
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,3 +38,4 @@ class Dude:
                 continue
 
             _LOGGER.info("Detect hotword")
+            self.speech.process(self.microphone)
