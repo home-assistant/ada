@@ -45,8 +45,9 @@ class Ada:
             _LOGGER.info("Detect hotword")
 
             # Start conversation
+            wait_time = 2
             while True:
-                text = self.speech.process(self.microphone)
+                text = self.speech.process(self.microphone, wait_time)
                 if not text or text == "stop":
                     break
 
@@ -56,4 +57,5 @@ class Ada:
 
                 if not self.voice.process(answer):
                     break
+                wait_time = 4
 

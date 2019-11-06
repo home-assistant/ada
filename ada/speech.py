@@ -13,8 +13,6 @@ from .microphone import Microphone
 
 _LOGGER = logging.getLogger(__name__)
 
-SILENT_WAIT_SECONDS = 2
-
 
 class Speech:
     """Speech processing."""
@@ -38,7 +36,9 @@ class Speech:
         """Return channel for recording."""
         return 1
 
-    def _get_voice_data(self, microphone: Microphone) -> Generator[bytes, None, None]:
+    def _get_voice_data(
+        self, microphone: Microphone, wait_time: int
+    ) -> Generator[bytes, None, None]:
         """Process voice speech."""
         silent_time = None
 
@@ -60,7 +60,7 @@ class Speech:
             if self._detect_silent(pcm):
                 if silent_time is None:
                     silent_time = monotonic()
-                elif monotonic() - silent_time > SILENT_WAIT_SECONDS:
+                elif monotonic() - silent_time > wait_time:
                     _LOGGER.info("Voice command ends")
                     return
             elif silent_time:
@@ -68,9 +68,11 @@ class Speech:
 
             yield pcm
 
-    def process(self, microphone: Microphone) -> Optional[str]:
+    def process(self, microphone: Microphone, wait_time: int) -> Optional[str]:
         """Process Speech to Text."""
-        speech = self.homeassistant.send_stt(self._get_voice_data(microphone))
+        speech = self.homeassistant.send_stt(
+            self._get_voice_data(microphone, wait_time)
+        )
 
         if not speech or speech["result"] != "success":
             _LOGGER.error("Can't detect speech on audio stream")
