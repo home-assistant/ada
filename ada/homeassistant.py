@@ -57,12 +57,3 @@ class HomeAssistant:
         if req.status_code != 200:
             return None
         return req.json()
-
-    def get_tts_audio(self, filename: str) -> Optional[bytes]:
-        """Retrieve audio file."""
-        _LOGGER.info("Retrieve speech from Home Assistant TTS")
-        req = requests.get(f"{self.url}/tts_proxy/{filename}", headers=self.headers)
-
-        if req.status_code != 200:
-            return None
-        return req.content

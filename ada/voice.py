@@ -1,6 +1,7 @@
 """Voice of Ada."""
-import subprocess
 import logging
+import os
+import subprocess
 
 from .homeassistant import HomeAssistant
 
@@ -15,14 +16,22 @@ class Voice:
         self.homeassistant: HomeAssistant = homeassistant
 
     @staticmethod
-    def _ffplay(audio: bytes) -> bool:
+    def _play(audio_url: str) -> bool:
         """Play Audio file from buffer."""
-        ffplay = subprocess.Popen(
-            ["ffplay", "-nodisp", "-"], stdin=subprocess.PIPE, stderr=None, stdout=None
+        play = subprocess.Popen(
+            [
+                "mplayer",
+                "-http-header-fields",
+                f"Authorization: Bearer {os.environ.get('HASSIO_TOKEN')}",
+                audio_url,
+            ],
+            stdin=None,
+            stderr=None,
+            stdout=None,
         )
 
-        ffplay.communicate(audio)
-        return ffplay.returncode == 0
+        play.wait()
+        return play.returncode == 0
 
     def process(self, answer: str) -> bool:
         """Process text to voice."""
@@ -34,9 +43,4 @@ class Voice:
         filename = url["url"].split("/")[-1]
         _LOGGER.info("TTS is available as %s", filename)
 
-        audio = self.homeassistant.get_tts_audio(filename)
-        if not audio:
-            _LOGGER.warning("Fails to retrieve the audio file")
-            return False
-
-        return self._ffplay(audio)
+        return self._play(f"{self.homeassistant.url}/tts_proxy/{filename}")
