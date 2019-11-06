@@ -43,7 +43,7 @@ class Speech:
             if self._detect_silent(pcm.tostring()):
                 if silent_time is None:
                     silent_time = monotonic()
-                elif monotonic() - silent_time < SILENT_WAIT_SECONDS:
+                elif monotonic() - silent_time > SILENT_WAIT_SECONDS:
                     _LOGGER.info("Command end")
                     return
 
