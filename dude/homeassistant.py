@@ -1,6 +1,6 @@
 """Handle Home Assistant requests."""
 import os
-from typing import Dict, Maybe
+from typing import Dict, Optional
 
 import requests
 
@@ -13,7 +13,7 @@ class HomeAssistant:
         self.url = "http://hassio/homeassistant/api"
         self.header = {"Authorization": f"Bearer {os.environ.get('HASSIO_TOKEN')}"}
 
-    def send_stt(self, data_gen) -> Dict[str, Maybe[str]]:
+    def send_stt(self, data_gen) -> Dict[str, Optional[str]]:
         """Send voice to STT handler."""
         headers = {
             **self.header,
