@@ -48,7 +48,7 @@ class Ada:
             wait_time = 2
             while True:
                 text = self.speech.process(self.microphone, wait_time)
-                if not text or text == "stop":
+                if not text or text == "Stop.":
                     break
 
                 answer = self.conversation.process(text)
