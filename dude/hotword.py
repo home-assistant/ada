@@ -4,10 +4,11 @@ from pathlib import Path
 import platform
 
 import pyaudio
+import numpy as np
 
 BASE_DIR = Path("/usr/local/lib/python3.7/dist-packages/pvporcupine")
 
-sys.path.append(Path(BASE_DIR, "binding/python"))
+sys.path.append(str(Path(BASE_DIR, "binding/python")))
 
 from porcupine import Porcupine
 
@@ -18,10 +19,10 @@ class Hotword:
     def __init__(self) -> None:
         """Initialize Hotword processing."""
         self.porcupine = Porcupine(
-            library_path=self._library_path,
-            model_file_path=self._model_file_path,
-            keyword_file_path=self._keyword_file_path,
-            sensitivities=0.5,
+            library_path=str(self._library_path),
+            model_file_path=str(self._model_file_path),
+            keyword_file_path=str(self._keyword_file_path),
+            sensitivity=0.5,
         )
 
     @property
@@ -44,7 +45,7 @@ class Hotword:
         """Return channel for recording."""
         return 1
 
-    def process(self, pcm) -> bool:
+    def process(self, pcm: np.ndarray) -> bool:
         """Process audio frame."""
         return self.porcupine.process(pcm)
 

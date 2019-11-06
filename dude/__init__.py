@@ -4,9 +4,12 @@ import struct
 from typing import Optional
 
 import pyaudio
+import samplerate
+import numpy as np
 
 from .hotword import Hotword
 from .speech import Speech
+from .microphone import Microphone
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -18,68 +21,38 @@ class Dude:
         """Initialize dude."""
         self.hotword: Hotword = Hotword()
         self.speech: Speech = Speech()
-
-        self.audio: Optional[pyaudio.PyAudio] = None
-        self.hotword_stream: Optional[pyaudio.Stream] = None
-        self.speech_stream: Optional[pyaudio.Stream] = None
-
-    def _open_audio(self):
-        """Open Audio stream."""
-        self.audio = pyaudio.PyAudio()
-
-        self.hotword_stream = self.audio.open(
-            rate=self.hotword.sample_rate,
-            channels=self.hotword.channel,
-            format=self.hotword.bit_rate,
-            input=True,
-            frames_per_buffer=self.hotword.frame_length,
-        )
-        self.speech_stream = self.audio.open(
-            rate=self.speech.sample_rate,
-            channels=self.speech.channel,
-            format=self.speech.bit_rate,
-            input=True,
-            frames_per_buffer=self.hotword.frame_length,
+        self.microphone: Microphone = Microphone()
+        self.resampler: samplerate.Resampler = samplerate.Resampler(
+            "sinc_best", channels=1
         )
 
-    def _close_audio(self):
-        """Close Audio stream."""
-        if self.hotword_stream:
-            self.hotword_stream.close()
-            self.hotword_stream = None
-        if self.speech_stream:
-            self.speech_stream.close()
-            self.speech_stream = None
-        if self.audio:
-            self.audio.terminate()
-            self.audio = None
-
-    def _read_audio(self):
-        """Read from audio stream."""
-        pcm_hotword = self.hotword_stream(
-            self.hotword.frame_length, exception_on_overflow=False
-        )
-        pcm_speech = self.speech_stream(
-            self.hotword.frame_length, exception_on_overflow=False
-        )
-
-        return (pcm_hotword, pcm_speech)
+        self.resampler_ratio: float = self.hotword.sample_rate / self.microphone.sample_rate
 
     def run(self) -> None:
         """Run Dude in a loop."""
-        self._open_audio()
+        self.microphone.start()
         try:
             self._run()
         finally:
-            self._close_audio()
+            self.microphone.close()
 
     def _run(self) -> None:
         """Internal Runner."""
         while True:
-            pcm, _ = self._read_audio()
-            pcm = struct.unpack_from("h" * self.hotword.frame_length, pcm)
+            pcm = self.microphone.get_frame()
 
-            if not self.hotword.process(pcm):
+            # Need resampling
+            if self.resampler_ratio != 1:
+                pcm = self.resampler(pcm, self.resampler_ratio)
+
+            found: bool = False
+            for frame in np.array_split(pcm, self.hotword.frame_length):
+                if not self.hotword.process(frame):
+                    continue
+                found = True
+                break
+
+            # Found hotword?
+            if not found:
                 continue
-
             _LOGGER.info("Detect hotword")
