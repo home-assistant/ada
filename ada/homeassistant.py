@@ -19,13 +19,13 @@ class HomeAssistant:
     def send_stt(
         self, data_gen: Generator[bytes, None, None]
     ) -> Optional[Dict[str, Optional[str]]]:
-        """Send voice to STT handler."""
+        """Send audio stream to STT handler."""
         headers = {
             **self.headers,
             "X-Speech-Content": "format=wav; codec=pcm; sample_rate=16000; bit_rate=16; channel=1; language=en-US",
         }
 
-        _LOGGER.info("Send voice to Home Assistant STT")
+        _LOGGER.info("Send audio stream to Home Assistant STT")
         req = requests.post(f"{self.url}/stt/cloud", data=data_gen, headers=headers)
 
         if req.status_code != 200:
