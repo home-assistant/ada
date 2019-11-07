@@ -21,6 +21,7 @@ class Voice:
         play = subprocess.Popen(
             [
                 "mplayer",
+                "-quiet",
                 "-http-header-fields",
                 f"Authorization: Bearer {os.environ.get('HASSIO_TOKEN')}",
                 audio_url,

@@ -77,6 +77,9 @@ class Speech:
         if not speech or speech["result"] != "success":
             _LOGGER.error("Can't detect speech on audio stream")
             return None
+        if not speech["text"]:
+            _LOGGER.info("No new command given")
+            return None
 
         _LOGGER.info("Retrieve follow Voice: %s", speech["text"])
         return speech["text"]
