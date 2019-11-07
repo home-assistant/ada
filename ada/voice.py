@@ -22,6 +22,7 @@ class Voice:
             [
                 "mplayer",
                 "-quiet",
+                "-prefer-ipv4",
                 "-http-header-fields",
                 f"Authorization: Bearer {os.environ.get('HASSIO_TOKEN')}",
                 audio_url,
