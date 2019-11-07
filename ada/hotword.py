@@ -58,6 +58,8 @@ class Hotword:
             return Path(BASE_DIR, "lib/linux/x86_64/libpv_porcupine.so")
         if machine == "armv7l":
             return Path(BASE_DIR, "lib/raspberry-pi/cortex-a53/libpv_porcupine.so")
+        if machine == "armv6l":
+            return Path(BASE_DIR, "lib/raspberry-pi/arm11/libpv_porcupine.so")
         raise RuntimeError("Architecture is not supported by Hotword")
 
     @property
@@ -72,7 +74,7 @@ class Hotword:
 
         if machine == "x86_64":
             return Path(BASE_DIR, "resources/keyword_files/linux/hey pico_linux.ppn")
-        if machine == "armv7l":
+        if machine in ("armv7l", "armv6l"):
             return Path(
                 BASE_DIR, "resources/keyword_files/raspberrypi/hey pico_raspberrypi.ppn"
             )
