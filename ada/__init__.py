@@ -58,4 +58,3 @@ class Ada:
                 if not self.voice.process(answer):
                     break
                 wait_time = 3
-
