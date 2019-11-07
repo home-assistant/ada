@@ -19,9 +19,9 @@ class Conversation:
         answer = self.homeassistant.send_conversation(text)
 
         if not answer:
-            _LOGGER.error("Can't start a conversation")
+            _LOGGER.error("Failed processing conversation")
             return None
         conversation = answer["speech"]["plain"]["speech"]
 
-        _LOGGER.info("Retrieve follow answer: %s", conversation)
+        _LOGGER.info("Conversation answer: %s", conversation)
         return conversation

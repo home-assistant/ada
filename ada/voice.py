@@ -39,7 +39,7 @@ class Voice:
         """Process text to voice."""
         url = self.homeassistant.send_tts(answer)
         if not url:
-            _LOGGER.warning("Not able to get an TTS URL")
+            _LOGGER.warning("Not able to get a TTS URL")
             return False
 
         filename = url["url"].split("/")[-1]

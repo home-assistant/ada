@@ -1,4 +1,5 @@
 """Microphone handler."""
+from typing import Optional
 
 import pyaudio
 import numpy as np

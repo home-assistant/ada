@@ -1,7 +1,5 @@
 """The Ada Module."""
 import logging
-import struct
-from typing import Optional
 
 from .conversation import Conversation
 from .homeassistant import HomeAssistant

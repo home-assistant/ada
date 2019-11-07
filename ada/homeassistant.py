@@ -25,7 +25,7 @@ class HomeAssistant:
             "X-Speech-Content": "format=wav; codec=pcm; sample_rate=16000; bit_rate=16; channel=1; language=en-US",
         }
 
-        _LOGGER.info("Send audio stream to Home Assistant STT")
+        _LOGGER.info("Sending audio stream to Home Assistant STT")
         req = requests.post(f"{self.url}/stt/cloud", data=data_gen, headers=headers)
 
         if req.status_code != 200:

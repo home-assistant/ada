@@ -1,3 +1,3 @@
 # Hey Ada!
 
-Home Assistant featured voice assist.
+Home Assistant featured voice assistant.

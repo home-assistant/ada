@@ -79,4 +79,3 @@ class Hotword:
                 BASE_DIR, "resources/keyword_files/raspberrypi/hey pico_raspberrypi.ppn"
             )
         raise RuntimeError("Architecture is not supported by Hotword")
-

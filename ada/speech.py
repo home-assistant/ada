@@ -61,7 +61,7 @@ class Speech:
                 if silent_time is None:
                     silent_time = monotonic()
                 elif monotonic() - silent_time > wait_time:
-                    _LOGGER.info("Voice command ends")
+                    _LOGGER.info("Voice command ended")
                     return
             elif silent_time:
                 silent_time = None
@@ -81,7 +81,7 @@ class Speech:
             _LOGGER.info("No new command given")
             return None
 
-        _LOGGER.info("Retrieve follow Voice: %s", speech["text"])
+        _LOGGER.info("Retrieved text: %s", speech["text"])
         return speech["text"]
 
     @staticmethod
