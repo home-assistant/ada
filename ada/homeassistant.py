@@ -37,7 +37,7 @@ class HomeAssistant:
         _LOGGER.info("Send text to Home Assistant conversation")
         req = requests.post(
             f"{self.url}/conversation/process",
-            json={"text": text},
+            json={"text": text, "conversation_id": "ada"},
             headers=self.headers,
         )
 
