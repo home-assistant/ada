@@ -63,6 +63,6 @@ class Microphone:
 
     def detect_silent(self) -> bool:
         """Return True if on last frame it detect silent."""
-        return not self.vad.s_speech(
+        return not self.vad.is_speech(
             self._last_frame[0:480].tostring(), self.sample_rate
         )
