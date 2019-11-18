@@ -1,5 +1,4 @@
 """Ada speech enginge."""
-import audioop
 import io
 import logging
 import wave
@@ -53,17 +52,17 @@ class Speech:
 
         # Process audio stream
         while True:
-            pcm = microphone.get_frame()
-            pcm = pcm.tostring()
+            pcm = microphone.get_frame().tostring()
 
             # Handle silent
-            if self._detect_silent(pcm):
+            if microphone.detect_silent():
                 if silent_time is None:
                     silent_time = monotonic()
                 elif monotonic() - silent_time > wait_time:
                     _LOGGER.info("Voice command ended")
                     return
-            elif silent_time:
+            else:
+                wait_time = 1
                 silent_time = None
 
             yield pcm
@@ -83,18 +82,3 @@ class Speech:
 
         _LOGGER.info("Retrieved text: %s", speech["text"])
         return speech["text"]
-
-    @staticmethod
-    def _detect_silent(pcm) -> bool:
-        """Detect audio silent."""
-        # compute RMS of debiased audio
-        energy = -audioop.rms(pcm, 2)
-        energy_bytes = bytes([energy & 0xFF, (energy >> 8) & 0xFF])
-        debiased_energy = audioop.rms(
-            audioop.add(pcm, energy_bytes * (len(pcm) // 2), 2), 2
-        )
-
-        if debiased_energy > 400:  # probably actually audio
-            return False
-        else:
-            return True
