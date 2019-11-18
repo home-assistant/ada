@@ -3,6 +3,7 @@ from typing import Optional
 
 import pyaudio
 import numpy as np
+import webrtcvad
 
 
 class Microphone:
@@ -11,10 +12,12 @@ class Microphone:
     def __init__(self, frame_length: int, sample_rate: int) -> None:
         """Initialize Microphone processing."""
         self.audio = pyaudio.PyAudio()
+        self.vad = webrtcvad.Vad(1)
         self.stream: Optional[pyaudio.Stream] = None
 
         self._frame_length = frame_length
         self._sample_rate = sample_rate
+        self._last_frame: Optional[np.ndarray] = None
 
     @property
     def frame_length(self) -> int:
@@ -55,5 +58,11 @@ class Microphone:
         """Read from audio stream."""
         raw = self.stream.read(self.frame_length, exception_on_overflow=False)
 
-        pcm = np.fromstring(raw, dtype=np.int16)
-        return pcm
+        self._last_frame = np.fromstring(raw, dtype=np.int16)
+        return self._last_frame.copy()
+
+    def detect_silent(self) -> bool:
+        """Return True if on last frame it detect silent."""
+        return not self.vad.s_speech(
+            self._last_frame[0:480].tostring(), self.sample_rate
+        )
