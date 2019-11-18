@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name="ada",
-    version="0.6",
+    version="0.7",
     license="Apache License 2.0",
     author="The Home Assistant Authors",
     author_email="hello@home-assistant.io",
