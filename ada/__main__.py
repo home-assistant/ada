@@ -1,7 +1,9 @@
 """Ada assistant."""
+import os
 import logging
 
-from ada import Ada
+from . import Ada
+from .options import Options
 
 
 def init_logger():
@@ -20,7 +22,14 @@ def main():
     """Run Application."""
     init_logger()
 
-    ada = Ada()
+    options = Options(
+        hass_api_url="http://hassio/homeassistant/api",
+        hass_token=os.environ.get("HASSIO_TOKEN"),
+        stt_platform="cloud",
+        tts_platform="cloud",
+    )
+
+    ada = Ada(options)
     ada.run()
 
 

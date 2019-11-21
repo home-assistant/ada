@@ -2,15 +2,14 @@
 import sys
 from pathlib import Path
 import platform
+from typing import TYPE_CHECKING, List, cast
 
 import pyaudio
 import numpy as np
+import importlib_metadata
 
-BASE_DIR = Path("/usr/local/lib/python3.7/dist-packages/pvporcupine")
-
-sys.path.append(str(Path(BASE_DIR, "binding/python")))
-
-from porcupine import Porcupine
+if TYPE_CHECKING:
+    from pvporcupine.binding.python.porcupine import Porcupine
 
 
 class Hotword:
@@ -18,12 +17,8 @@ class Hotword:
 
     def __init__(self) -> None:
         """Initialize Hotword processing."""
-        self.porcupine = Porcupine(
-            library_path=str(self._library_path),
-            model_file_path=str(self._model_file_path),
-            keyword_file_path=str(self._keyword_file_path),
-            sensitivity=0.5,
-        )
+        loader = PorcupineLoader()
+        self.porcupine = loader.load()
 
     @property
     def frame_length(self) -> int:
@@ -49,33 +44,68 @@ class Hotword:
         """Process audio frame."""
         return self.porcupine.process(pcm)
 
-    @property
-    def _library_path(self) -> Path:
+
+class PorcupineLoader:
+    """Class to help loading Porcupine."""
+
+    def load(self) -> "Porcupine":
+        """Load Porcupine object."""
+        dist = importlib_metadata.distribution("pvporcupine")
+        porcupine_paths = [
+            f
+            for f in cast(List[importlib_metadata.PackagePath], dist.files)
+            if f.name == "porcupine.py"
+        ]
+
+        if not porcupine_paths:
+            raise RuntimeError("Unable to find porcupine.py in pvporcupine package")
+
+        porcupine_path = porcupine_paths[0].locate().parent
+        lib_path = porcupine_path.parent.parent
+
+        sys.path.append(str(porcupine_path))
+
+        if not TYPE_CHECKING:
+            # pylint: disable=import-outside-toplevel, import-error
+            from porcupine import Porcupine
+
+        return Porcupine(
+            library_path=str(self._library_path(lib_path)),
+            model_file_path=str(self._model_file_path(lib_path)),
+            keyword_file_path=str(self._keyword_file_path(lib_path)),
+            sensitivity=0.5,
+        )
+
+    @staticmethod
+    def _library_path(lib_path: Path) -> Path:
         """Return Path to library."""
         machine = platform.machine()
 
         if machine == "x86_64":
-            return Path(BASE_DIR, "lib/linux/x86_64/libpv_porcupine.so")
+            return lib_path / "lib/linux/x86_64/libpv_porcupine.so"
         if machine == "armv7l":
-            return Path(BASE_DIR, "lib/raspberry-pi/cortex-a53/libpv_porcupine.so")
+            return lib_path / "lib/raspberry-pi/cortex-a53/libpv_porcupine.so"
         if machine == "armv6l":
-            return Path(BASE_DIR, "lib/raspberry-pi/arm11/libpv_porcupine.so")
+            return lib_path / "lib/raspberry-pi/arm11/libpv_porcupine.so"
+
         raise RuntimeError("Architecture is not supported by Hotword")
 
-    @property
-    def _model_file_path(self) -> Path:
+    @staticmethod
+    def _model_file_path(lib_path: Path) -> Path:
         """Return Path to Model file."""
-        return Path(BASE_DIR, "lib/common/porcupine_params.pv")
+        return lib_path / "lib/common/porcupine_params.pv"
 
-    @property
-    def _keyword_file_path(self) -> Path:
+    @staticmethod
+    def _keyword_file_path(lib_path: Path) -> Path:
         """Return Path to hotword keyfile."""
         machine = platform.machine()
 
         if machine == "x86_64":
-            return Path(BASE_DIR, "resources/keyword_files/linux/hey pico_linux.ppn")
+            return lib_path / "resources/keyword_files/linux/hey pico_linux.ppn"
         if machine in ("armv7l", "armv6l"):
-            return Path(
-                BASE_DIR, "resources/keyword_files/raspberrypi/hey pico_raspberrypi.ppn"
+            return (
+                lib_path
+                / "resources/keyword_files/raspberrypi/hey pico_raspberrypi.ppn"
             )
+
         raise RuntimeError("Architecture is not supported by Hotword")

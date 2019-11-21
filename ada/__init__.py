@@ -5,6 +5,7 @@ from .conversation import Conversation
 from .homeassistant import HomeAssistant
 from .hotword import Hotword
 from .microphone import Microphone
+from .options import Options
 from .speech import Speech
 from .voice import Voice
 
@@ -14,13 +15,13 @@ _LOGGER = logging.getLogger(__name__)
 class Ada:
     """Hey Ada assistant."""
 
-    def __init__(self):
+    def __init__(self, options: Options):
         """Initialize ada."""
-        self.homeassistant = HomeAssistant()
+        self.homeassistant = HomeAssistant(options)
         self.hotword: Hotword = Hotword()
         self.speech: Speech = Speech(self.homeassistant)
         self.conversation: Conversation = Conversation(self.homeassistant)
-        self.voice: Voice = Voice(self.homeassistant)
+        self.voice: Voice = Voice(self.homeassistant, options)
         self.microphone: Microphone = Microphone(
             self.hotword.frame_length, self.hotword.sample_rate
         )
