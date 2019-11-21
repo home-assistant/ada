@@ -25,6 +25,8 @@ def main():
     options = Options(
         hass_api_url="http://hassio/homeassistant/api",
         hass_token=os.environ.get("HASSIO_TOKEN"),
+        stt_platform="cloud",
+        tts_platform="cloud",
     )
 
     ada = Ada(options)

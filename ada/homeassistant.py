@@ -28,7 +28,9 @@ class HomeAssistant:
 
         _LOGGER.info("Sending audio stream to Home Assistant STT")
         req = requests.post(
-            f"{self.options.hass_api_url}/stt/cloud", data=data_gen, headers=headers
+            f"{self.options.hass_api_url}/stt/{self.options.stt_platform}",
+            data=data_gen,
+            headers=headers,
         )
 
         if req.status_code != 200:
@@ -53,7 +55,7 @@ class HomeAssistant:
         _LOGGER.info("Send text to Home Assistant TTS")
         req = requests.post(
             f"{self.options.hass_api_url}/tts_get_url",
-            json={"platform": "cloud", "message": text},
+            json={"platform": self.options.tts_platform, "message": text},
             headers=self.headers,
         )
 
