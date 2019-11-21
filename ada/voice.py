@@ -1,9 +1,9 @@
 """Voice of Ada."""
 import logging
-import os
 import subprocess
 
 from .homeassistant import HomeAssistant
+from .options import Options
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -11,12 +11,12 @@ _LOGGER = logging.getLogger(__name__)
 class Voice:
     """Voice of ada."""
 
-    def __init__(self, homeassistant: HomeAssistant) -> None:
+    def __init__(self, homeassistant: HomeAssistant, options: Options) -> None:
         """Initialize Voice output processing."""
         self.homeassistant: HomeAssistant = homeassistant
+        self.options: Options = options
 
-    @staticmethod
-    def _play(audio_url: str) -> bool:
+    def _play(self, audio_url: str) -> bool:
         """Play Audio file from buffer."""
         play = subprocess.Popen(
             [
@@ -24,7 +24,7 @@ class Voice:
                 "-quiet",
                 "-prefer-ipv4",
                 "-http-header-fields",
-                f"Authorization: Bearer {os.environ.get('HASSIO_TOKEN')}",
+                f"Authorization: Bearer {self.options.hass_token}",
                 audio_url,
             ],
             stdin=None,
@@ -45,4 +45,4 @@ class Voice:
         filename = url["url"].split("/")[-1]
         _LOGGER.info("TTS is available as %s", filename)
 
-        return self._play(f"{self.homeassistant.url}/tts_proxy/{filename}")
+        return self._play(f"{self.options.hass_api_url}/tts_proxy/{filename}")

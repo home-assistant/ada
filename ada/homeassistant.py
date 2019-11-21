@@ -1,9 +1,10 @@
 """Handle Home Assistant requests."""
 import logging
-import os
 from typing import Dict, Optional, Generator
 
 import requests
+
+from .options import Options
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -11,10 +12,10 @@ _LOGGER = logging.getLogger(__name__)
 class HomeAssistant:
     """Handle Home Assistant API requests."""
 
-    def __init__(self):
+    def __init__(self, options: Options):
         """Initialize Home Assistant API."""
-        self.url = "http://hassio/homeassistant/api"
-        self.headers = {"Authorization": f"Bearer {os.environ.get('HASSIO_TOKEN')}"}
+        self.options = options
+        self.headers = {"Authorization": f"Bearer {options.hass_token}"}
 
     def send_stt(
         self, data_gen: Generator[bytes, None, None]
@@ -26,17 +27,19 @@ class HomeAssistant:
         }
 
         _LOGGER.info("Sending audio stream to Home Assistant STT")
-        req = requests.post(f"{self.url}/stt/cloud", data=data_gen, headers=headers)
+        req = requests.post(
+            f"{self.options.hass_api_url}/stt/cloud", data=data_gen, headers=headers
+        )
 
         if req.status_code != 200:
             return None
         return req.json()
 
-    def send_conversation(self, text: str) -> Optional[str]:
+    def send_conversation(self, text: str) -> Optional[dict]:
         """Send Conversation text to API."""
         _LOGGER.info("Send text to Home Assistant conversation")
         req = requests.post(
-            f"{self.url}/conversation/process",
+            f"{self.options.hass_api_url}/conversation/process",
             json={"text": text, "conversation_id": "ada"},
             headers=self.headers,
         )
@@ -45,11 +48,11 @@ class HomeAssistant:
             return None
         return req.json()
 
-    def send_tts(self, text: str) -> Optional[str]:
+    def send_tts(self, text: str) -> Optional[dict]:
         """Send a text for TTS."""
         _LOGGER.info("Send text to Home Assistant TTS")
         req = requests.post(
-            f"{self.url}/tts_get_url",
+            f"{self.options.hass_api_url}/tts_get_url",
             json={"platform": "cloud", "message": text},
             headers=self.headers,
         )

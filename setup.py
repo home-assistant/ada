@@ -28,6 +28,13 @@ setup(
     keywords=["voice", "home-assistant", "personal"],
     zip_safe=False,
     platforms="any",
-    packages=["ada",],
+    packages=["ada"],
+    install_requires=[
+        "requests",
+        "numpy",
+        "webrtcvad",
+        "pyaudio",
+        "importlib_metadata",
+    ],
     include_package_data=True,
 )
