@@ -35,6 +35,7 @@ setup(
         "webrtcvad",
         "pyaudio",
         "importlib_metadata",
+        "click"
     ],
     include_package_data=True,
 )

@@ -3,3 +3,4 @@ numpy==1.17.3
 PyAudio==0.2.11
 requests==2.22.0
 webrtcvad==2.0.10
+click==7.0
