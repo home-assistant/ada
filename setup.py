@@ -37,5 +37,6 @@ setup(
         "importlib_metadata",
         "click"
     ],
+    setup_requires=['wheel'],
     include_package_data=True,
 )
