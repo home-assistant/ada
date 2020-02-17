@@ -83,7 +83,7 @@ class PorcupineLoader:
 
         if machine == "x86_64":
             return lib_path / "lib/linux/x86_64/libpv_porcupine.so"
-        if machine == "armv7l":
+        if machine in ("armv7l", "aarch64"):
             return lib_path / "lib/raspberry-pi/cortex-a53/libpv_porcupine.so"
         if machine == "armv6l":
             return lib_path / "lib/raspberry-pi/arm11/libpv_porcupine.so"
