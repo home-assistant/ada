@@ -102,7 +102,7 @@ class PorcupineLoader:
 
         if machine == "x86_64":
             return lib_path / "resources/keyword_files/linux/hey pico_linux.ppn"
-        if machine in ("armv7l", "armv6l"):
+        if machine in ("armv7l", "aarch64", "armv6l"):
             return (
                 lib_path
                 / "resources/keyword_files/raspberrypi/hey pico_raspberrypi.ppn"
