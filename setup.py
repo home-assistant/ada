@@ -2,6 +2,7 @@
 from pathlib import Path
 from setuptools import setup
 
+requirements = Path("requirements.txt").open().readlines()
 
 setup(
     name="ada",
@@ -29,13 +30,6 @@ setup(
     zip_safe=False,
     platforms="any",
     packages=["ada"],
-    install_requires=[
-        "requests",
-        "numpy",
-        "webrtcvad",
-        "pyaudio",
-        "importlib_metadata",
-        "click"
-    ],
+    install_requires=requirements,
     include_package_data=True,
 )
