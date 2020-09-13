@@ -27,11 +27,15 @@ class HomeAssistant:
         }
 
         _LOGGER.info("Sending audio stream to Home Assistant STT")
+        if self.options.pixels:
+            self.options.pixels.think()
         req = requests.post(
             f"{self.options.hass_api_url}/stt/{self.options.stt_platform}",
             data=data_gen,
             headers=headers,
         )
+        if self.options.pixels:
+            self.options.pixels.off()
 
         if req.status_code != 200:
             return None

@@ -30,12 +30,19 @@ def init_logger():
 @click.option(
     "--tts", required=True, type=str, help="Name of Home Assistant TTS provider."
 )
-def main(url, key, stt, tts):
+@click.option("--ring/--no-ring", type=bool, default=False,)
+def main(url, key, stt, tts, ring):
     """Run Application."""
     init_logger()
-
+    if ring:
+        from pixel_ring import pixel_ring
+        ring = pixel_ring
     options = Options(
-        hass_api_url=url, hass_token=key, stt_platform=stt, tts_platform=tts,
+        hass_api_url=url,
+        hass_token=key,
+        stt_platform=stt,
+        tts_platform=tts,
+        pixels=ring
     )
 
     ada = Ada(options)

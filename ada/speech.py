@@ -69,9 +69,10 @@ class Speech:
 
     def process(self, microphone: Microphone, wait_time: int) -> Optional[str]:
         """Process Speech to Text."""
-        speech = self.homeassistant.send_stt(
-            self._get_voice_data(microphone, wait_time)
-        )
+        if self.homeassistant.options.pixels:
+            self.homeassistant.options.pixels.listen()
+        speech_gen = self._get_voice_data(microphone, wait_time)
+        speech = self.homeassistant.send_stt(speech_gen)
 
         if not speech or speech["result"] != "success":
             _LOGGER.error("Can't detect speech on audio stream")

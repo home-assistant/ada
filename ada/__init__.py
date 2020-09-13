@@ -25,6 +25,7 @@ class Ada:
         self.microphone: Microphone = Microphone(
             self.hotword.frame_length, self.hotword.sample_rate
         )
+        self.pixels = options.pixels
 
     def run(self) -> None:
         """Run Ada in a loop."""
@@ -45,6 +46,8 @@ class Ada:
 
             # Start conversation
             wait_time = 2
+            if self.pixels:
+                self.pixels.listen()
             while True:
                 text = self.speech.process(self.microphone, wait_time)
                 if not text or text == "Stop.":
