@@ -101,11 +101,11 @@ class PorcupineLoader:
         machine = platform.machine()
 
         if machine == "x86_64":
-            return lib_path / "resources/keyword_files/linux/hey pico_linux.ppn"
+            return lib_path / "resources/keyword_files/linux/jarvis_linux.ppn"
         if machine in ("armv7l", "aarch64", "armv6l"):
             return (
                 lib_path
-                / "resources/keyword_files/raspberrypi/hey pico_raspberrypi.ppn"
+                / "resources/keyword_files/raspberrypi/jarvis_raspberrypi.ppn"
             )
 
         raise RuntimeError("Architecture is not supported by Hotword")
